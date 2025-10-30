@@ -1,0 +1,21 @@
+﻿// Part One: 
+CREATE TABLE requests 
+(
+	Name varchar(100),
+	Email varchar(100),
+	Phone varchar(100),
+	Street varchar(100),
+	City varchar(100),
+	State varchar(100),
+	Zip varchar(100),
+	ServiceDateTime DATETIME2
+);
+
+//Part Three
+CREATE TABLE reviews
+(
+	RatingControl FLOAT,
+	Title varchar(100),
+	Review varchar(MAX),
+	Name varchar(100)
+);

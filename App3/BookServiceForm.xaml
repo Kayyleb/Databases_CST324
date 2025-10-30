@@ -1,0 +1,73 @@
+﻿<Page
+    x:Class="App3.BookServiceForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:App3"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <StackPanel Orientation="Vertical">
+        <TextBox x:Name="Name" Header="Name"/>
+        <TextBox x:Name="Email" Header="Email"/>
+        <TextBox x:Name="Phone" Header="Phone"/>
+        <TextBox x:Name="Street" Header="Street"/>
+        <TextBox x:Name="City" Header="City"/>
+        <ComboBox x:Name="State" Header="State">
+            <ComboBoxItem Content="Alabama"/>
+            <ComboBoxItem Content="Alaska"/>
+            <ComboBoxItem Content="Arizona"/>
+            <ComboBoxItem Content="Arkansas"/>
+            <ComboBoxItem Content="California"/>
+            <ComboBoxItem Content="Colorado"/>
+            <ComboBoxItem Content="Connecticut"/>
+            <ComboBoxItem Content="Delaware"/>
+            <ComboBoxItem Content="Florida"/>
+            <ComboBoxItem Content="Georgia"/>
+            <ComboBoxItem Content="Hawaii"/>
+            <ComboBoxItem Content="Idaho"/>
+            <ComboBoxItem Content="Illinois"/>
+            <ComboBoxItem Content="Indiana"/>
+            <ComboBoxItem Content="Iowa"/>
+            <ComboBoxItem Content="Kansas"/>
+            <ComboBoxItem Content="Kentucky"/>
+            <ComboBoxItem Content="Louisiana"/>
+            <ComboBoxItem Content="Maine"/>
+            <ComboBoxItem Content="Maryland"/>
+            <ComboBoxItem Content="Massachesetts"/>
+            <ComboBoxItem Content="Michigan"/>
+            <ComboBoxItem Content="Minnesota"/>
+            <ComboBoxItem Content="Mississippi"/>
+            <ComboBoxItem Content="Missouri"/>
+            <ComboBoxItem Content="Montana"/>
+            <ComboBoxItem Content="Nebraska"/>
+            <ComboBoxItem Content="Nevada"/>
+            <ComboBoxItem Content="new Hampshire"/>
+            <ComboBoxItem Content="New Jersey"/>
+            <ComboBoxItem Content="New Mexico"/>
+            <ComboBoxItem Content="New York"/>
+            <ComboBoxItem Content="North Carolina"/>
+            <ComboBoxItem Content="North Dakota"/>
+            <ComboBoxItem Content="Ohio"/>
+            <ComboBoxItem Content="Oklahoma"/>
+            <ComboBoxItem Content="Oregon"/>
+            <ComboBoxItem Content="Pennsylvania"/>
+            <ComboBoxItem Content="Rhode Island"/>
+            <ComboBoxItem Content="South Carolina"/>
+            <ComboBoxItem Content="South Dakota"/>
+            <ComboBoxItem Content="Tennessee"/>
+            <ComboBoxItem Content="Texas"/>
+            <ComboBoxItem Content="Utah"/>
+            <ComboBoxItem Content="Vermont"/>
+            <ComboBoxItem Content="Virginia"/>
+            <ComboBoxItem Content="Washington"/>
+            <ComboBoxItem Content="West Virginia"/>
+            <ComboBoxItem Content="Wisconsin"/>
+            <ComboBoxItem Content="Wyoming"/>
+        </ComboBox>
+            <TextBox x:Name="ZipCode" Header="ZipCode"/>
+        <CalendarDatePicker Name="ServiceCalendarPicker"/>
+        <TimePicker x:Name="ServiceTimePicker"/>
+        <Button Content="Request" Click="SubmitData"/>
+    </StackPanel>
+</Page>
