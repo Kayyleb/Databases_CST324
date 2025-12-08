@@ -7,6 +7,8 @@ namespace GoogleCloudSamples
     {
         public static void Main(string[] args)
         {
+            DateTime begin = DateTime.Now;
+
             string projectId = "lab-2-474618";
             var client = BigQueryClient.Create(projectId);
             string query = @"SELECT PLU ,Variety
@@ -19,6 +21,13 @@ namespace GoogleCloudSamples
                 Console.WriteLine($"{row["PLU"]}: {row["Variety"]}");
 
             }
+
+            Console.WriteLine("\n");
+            DateTime end = DateTime.Now;
+            Double diff = end.Subtract(begin).TotalMilliseconds;
+            Console.WriteLine(diff);
         }
     }
 }
+
+
