@@ -8,13 +8,16 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -26,6 +29,7 @@ namespace Lab_99
     public sealed partial class MainPage : Page
     {
         ObservableCollection<Product> inventory;
+        int ticketPhase = 0;
         private string connectionString =
             "server=aura.cset.oit.edu,5433; " +
             "database=duffies; " +
@@ -37,8 +41,9 @@ namespace Lab_99
             this.InitializeComponent();
 
             inventory = GetProducts();
-      
-            DisplayGrid.ItemsSource = inventory;
+
+            ticketPhase = 0;
+            ShowProduct();
         }
 
         private ObservableCollection<Product> GetProducts()
@@ -76,5 +81,79 @@ namespace Lab_99
             }
           return products;
         }
+
+        private void ShowProduct()
+        {
+            IEnumerable<Product> productsToShow;
+
+            if (ticketPhase == 0)
+            {
+                // Entree phase: only show sandwiches/wraps (adjust as your teacher wants)
+                productsToShow = inventory.Where(p =>
+                    p.Desc.IndexOf("sandwich", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    p.Desc.IndexOf("wrap", StringComparison.OrdinalIgnoreCase) >= 0);
+            }
+            else
+            {
+                // Side phase: show everything
+                productsToShow = inventory;
+            }
+
+            DisplayGrid.ItemsSource =
+                new ObservableCollection<Product>(productsToShow);
+
+            // Clear any previous selection
+            DisplayGrid.SelectedItem = null;
+        }
+
+        private void SelectProduct(object sender, SelectionChangedEventArgs e)
+        {
+            var product = DisplayGrid.SelectedItem as Product;
+            if (product == null) return;
+
+            // Build image
+            Image image = new Image
+            {
+                Width = 150,
+                Height = 150,
+                Margin = new Thickness(4)
+            };
+
+            BitmapImage bitmap = new BitmapImage();
+            bitmap.UriSource = new Uri(BaseUri, product.ImageSrc);
+            image.Source = bitmap;
+
+            // Text under image (name + price)
+            TextBlock text = new TextBlock
+            {
+                Text = $"{product.Name}\n{product.DisplayPrice}",
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = new SolidColorBrush(Colors.Black)
+            };
+
+            if (ticketPhase == 0)
+            {
+                // User just picked an entree
+                Entree.Children.Clear();
+                Entree.Children.Add(image);
+                Entree.Children.Add(text);
+
+                ticketPhase = 1;     // now pick a side
+            }
+            else
+            {
+                // User just picked a side
+                Side.Children.Clear();
+                Side.Children.Add(image);
+                Side.Children.Add(text);
+
+                ticketPhase = 0;     // go back to entree for next ticket
+            }
+
+            // Refresh what products are shown for the new phase
+            ShowProduct();
+        }
+
+
     }
 }
