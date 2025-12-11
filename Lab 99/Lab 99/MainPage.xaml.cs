@@ -32,7 +32,7 @@ namespace Lab_99
         int ticketPhase = 0;
         private string connectionString =
             "server=aura.cset.oit.edu,5433; " +
-            "database=duffies; " +
+            "database=kayleb; " +
             "UID=kayleb; " +
             "password=kayleb";
 
@@ -50,7 +50,7 @@ namespace Lab_99
         {
             ObservableCollection<Product> products = new ObservableCollection<Product>();
 
-            string query = "SELECT Product_ID, Name, Description, Brand, Price FROM Product";
+            string query = "SELECT ProductID, Name, Description, Brand, Price FROM Product";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))

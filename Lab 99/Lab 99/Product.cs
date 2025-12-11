@@ -13,9 +13,11 @@ namespace Lab_99
         public string ImageSrc { get; set; }
         public string Name { get; set; }
         public string Desc { get; set; }
-        public string Brand { get; set; }
+       // public string Brand { get; set; }
         public double Price { get; set; }
         public string DisplayPrice => $"{Price:C}";
+        public byte inventoryCount { get; set; }
+        public string DisplayInventory => $"In stock: {inventoryCount}";
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string propertyName)
