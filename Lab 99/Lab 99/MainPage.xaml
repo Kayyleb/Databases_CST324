@@ -34,18 +34,27 @@
                 <StackPanel Width="200" Margin="4">
                     <TextBlock Text="Student #"
                                Margin="0,0,0,4"
-                               Foreground="Black"
-/>
+                               Foreground="Black"/>
+
+                    <!-- Helps enforce numeric input on mobile; fine on desktop too -->
                     <TextBox x:Name="StudentIdBox"
                              Width="150"
                              Margin="0,0,0,8"
                              Foreground="Black"
-/>
+                             InputScope="Number"/>
+
+                    <!-- IMPORTANT: wire up Click -->
                     <Button x:Name="BuyButton"
                             Content="Buy"
                             Width="100"
                             Foreground="Black"
-/>
+                            Click="BuyButton_Click"/>
+
+                    <!-- Optional: show messages like "Purchased!" or errors -->
+                    <TextBlock x:Name="StatusText"
+                               Margin="0,8,0,0"
+                               Foreground="Black"
+                               TextWrapping="Wrap"/>
                 </StackPanel>
             </StackPanel>
 
@@ -68,7 +77,8 @@
                                        Foreground="Black"
                                        Margin="0,0,0,4"/>
 
-                            <TextBlock Text="{x:Bind Brand}"
+                            <!-- CHANGED: Show inventory count instead of Brand -->
+                            <TextBlock Text="{x:Bind inventoryCount}"
                                        FontSize="16"
                                        Foreground="Black"
                                        Margin="0,0,0,4"/>

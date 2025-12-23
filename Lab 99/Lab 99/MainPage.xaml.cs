@@ -1,35 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace Lab_99
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
-        ObservableCollection<Product> inventory;
-        int ticketPhase = 0;
+        private ObservableCollection<Product> inventory;
+        private int ticketPhase = 0;
+
+        private byte entreeId = 0;
+        private byte sideId = 0;
+
         private string connectionString =
             "server=aura.cset.oit.edu,5433; " +
             "database=kayleb; " +
@@ -40,17 +30,21 @@ namespace Lab_99
         {
             this.InitializeComponent();
 
-            inventory = GetProducts();
-
+            entreeId = 0;
+            sideId = 0;
             ticketPhase = 0;
+
+            inventory = GetProducts();
             ShowProduct();
+
+            StatusText.Text = "Pick an entree.";
         }
 
         private ObservableCollection<Product> GetProducts()
         {
             ObservableCollection<Product> products = new ObservableCollection<Product>();
 
-            string query = "SELECT ProductID, Name, Description, Brand, Price FROM Product";
+            string query = "SELECT ProductID, Name, Description, Price, InventoryCount FROM Product";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             using (SqlCommand cmd = new SqlCommand(query, conn))
@@ -61,25 +55,26 @@ namespace Lab_99
                 {
                     while (reader.Read())
                     {
-                        byte id = reader.GetByte(0);                
-                        string name = reader.GetString(1);         
-                        string description = reader.GetString(2); 
-                        string brand = reader.GetString(3);         
-                        double price = reader.GetDouble(4);
+                        byte id = reader.GetByte(0);
+                        string name = reader.GetString(1);
+                        string description = reader.GetString(2);
+                        double price = reader.GetDouble(3);
+                        byte inv = reader.GetByte(4);
 
                         Product item = new Product();
-                        item.ProductID = "" + id;
+                        item.ProductID = id.ToString();
                         item.Name = name;
                         item.Desc = description;
-                        item.Brand = brand;
                         item.Price = price;
+                        item.inventoryCount = inv;   // lowercase on purpose
                         item.ImageSrc = "Assets/" + id + ".jpg";
 
                         products.Add(item);
                     }
                 }
             }
-          return products;
+
+            return products;
         }
 
         private void ShowProduct()
@@ -88,21 +83,19 @@ namespace Lab_99
 
             if (ticketPhase == 0)
             {
-                // Entree phase: only show sandwiches/wraps (adjust as your teacher wants)
                 productsToShow = inventory.Where(p =>
                     p.Desc.IndexOf("sandwich", StringComparison.OrdinalIgnoreCase) >= 0 ||
                     p.Desc.IndexOf("wrap", StringComparison.OrdinalIgnoreCase) >= 0);
+
+                StatusText.Text = "Pick an entree.";
             }
             else
             {
-                // Side phase: show everything
                 productsToShow = inventory;
+                StatusText.Text = "Pick a side.";
             }
 
-            DisplayGrid.ItemsSource =
-                new ObservableCollection<Product>(productsToShow);
-
-            // Clear any previous selection
+            DisplayGrid.ItemsSource = new ObservableCollection<Product>(productsToShow);
             DisplayGrid.SelectedItem = null;
         }
 
@@ -111,7 +104,6 @@ namespace Lab_99
             var product = DisplayGrid.SelectedItem as Product;
             if (product == null) return;
 
-            // Build image
             Image image = new Image
             {
                 Width = 150,
@@ -123,37 +115,82 @@ namespace Lab_99
             bitmap.UriSource = new Uri(BaseUri, product.ImageSrc);
             image.Source = bitmap;
 
-            // Text under image (name + price)
             TextBlock text = new TextBlock
             {
-                Text = $"{product.Name}\n{product.DisplayPrice}",
+                Text = $"{product.Name}\n{product.DisplayPrice}\nIn stock: {product.inventoryCount}",
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = new SolidColorBrush(Colors.Black)
             };
 
             if (ticketPhase == 0)
             {
-                // User just picked an entree
                 Entree.Children.Clear();
                 Entree.Children.Add(image);
                 Entree.Children.Add(text);
 
-                ticketPhase = 1;     // now pick a side
+                entreeId = Convert.ToByte(product.ProductID);
+                ticketPhase = 1;
+
+                StatusText.Text = $"Entree selected (ID={entreeId}). Now pick a side.";
             }
             else
             {
-                // User just picked a side
                 Side.Children.Clear();
                 Side.Children.Add(image);
                 Side.Children.Add(text);
 
-                ticketPhase = 0;     // go back to entree for next ticket
+                sideId = Convert.ToByte(product.ProductID);
+                ticketPhase = 0;
+
+                StatusText.Text = $"Side selected (ID={sideId}). Click Buy.";
             }
 
-            // Refresh what products are shown for the new phase
             ShowProduct();
         }
 
+        private void BuyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!int.TryParse(StudentIdBox.Text, out int sid))
+            {
+                StatusText.Text = "Enter a valid Student ID.";
+                return;
+            }
 
+            if (entreeId == 0 || sideId == 0)
+            {
+                StatusText.Text = $"Missing selection. EntreeId={entreeId}, SideId={sideId}";
+                return;
+            }
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand("purchaseTicket", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@EntreeId", SqlDbType.TinyInt).Value = entreeId;
+                    cmd.Parameters.Add("@SideId", SqlDbType.TinyInt).Value = sideId;
+                    cmd.Parameters.Add("@StudentId", SqlDbType.Int).Value = sid;
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
+
+                StatusText.Text = $"Purchased! (EntreeId={entreeId}, SideId={sideId})";
+
+                inventory = GetProducts();
+                ShowProduct();
+
+                Entree.Children.Clear();
+                Side.Children.Clear();
+                entreeId = 0;
+                sideId = 0;
+                ticketPhase = 0;
+            }
+            catch (SqlException ex)
+            {
+                StatusText.Text = ex.Message;
+            }
+        }
     }
 }

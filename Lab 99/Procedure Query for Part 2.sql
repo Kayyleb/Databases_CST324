@@ -16,7 +16,7 @@ BEGIN
     DECLARE @EntreeInv     TINYINT;
     DECLARE @SideInv       TINYINT;
 
-    SET @TicketId = NEXT VALUE FOR TicketIDSeq;
+    SET @TicketId = NEXT VALUE FOR kayleb.TicketId;
 
     SELECT
         @EntreePrice = Price,
@@ -43,6 +43,9 @@ BEGIN
         RAISERROR('Entree is out of stock.', 16, 1);
         RETURN;
     END;
+
+
+
 
     IF (@SideInv IS NULL OR @SideInv <= 0)
     BEGIN
